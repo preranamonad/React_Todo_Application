@@ -33,6 +33,7 @@ class AddModal extends React.Component{
             <Modal
                 ref={"myModal"}
                 style={{
+                  flex: 1,
                   backgroundColor: '#000000aa',
                 }}
                 position='center'
