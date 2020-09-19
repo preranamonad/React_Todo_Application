@@ -27,24 +27,50 @@ import{
   Header,
   Body,
   Title,
+  CheckBox,
+  Left,
+  Button,
+  Icon
   } from 'native-base';
 
 import flatListData from './data/flatListData';
 import AddModal from './component/AddModal';
+import EditModal from './component/EditModal'
 
 class FlatListItem extends React.Component {
   constructor(props) {
       super(props); 
       this.state = {
-        activeRowKey: null  //this state saved key of deleting object
+        activeRowKey: null,  //this state saved key of deleting object
+        numberOfRefresh: 0,
+        selectedLang:false,
       }  
          
   }
+  refreshFlatListItem = () => {
+    this.setState((prevState) => {
+        return {
+            numberOfRefresh: prevState.numberOfRefresh + 1
+        };
+    });        
+}
   render(){
- 
+    const {selectedLang} = this.state;
+
     return(
       <View style={styles.flatlistview}>
-         <Text style={styles.flatListItem}>{this.props.item.name}</Text>
+
+        <CheckBox checked={selectedLang} style={styles.checkbox} onPress={()=>this.setState({selectedLang:!selectedLang})}/>
+
+         <Text style={{...styles.checkBoxTxt,
+                color:this.state.selectedLang?"white":"white",
+                textDecorationLine:this.state.selectedLang? "line-through" :"none"
+              }}>{this.props.item.name}</Text>
+
+         <TouchableOpacity onPress={() => {                            
+                        // alert("Update");
+                        this.props.parentFlatList.refs.editModal.showEditModal(flatListData[this.props.index], this);
+                    }} style={styles.editbutton}><Text style={styles.edittext}>Edit</Text></TouchableOpacity>
          
          <TouchableOpacity onPress={() => {    
                         const deletingRow = this.state.activeRowKey;          
@@ -94,12 +120,15 @@ class App extends React.Component{
       <Container>
          <View style={{flex: 1}}>
         <Header>
+        <Left>
+            <Button transparent>
+              <Icon name='menu' />
+            </Button>
+          </Left>
           <Body style={{alignItems: 'center'}}>
             <Title >Todo Application</Title>
           </Body>
         </Header>
-     
-       
         <TouchableOpacity onPress={this.onPressAdd}  style={styles.button} >
             <Text style={{color: 'white'}}>Create Todo</Text>
         </TouchableOpacity>
@@ -113,6 +142,7 @@ class App extends React.Component{
         } }
         ></FlatList>
         <AddModal ref={'addModal'} parentFlatList={this}></AddModal>
+        <EditModal ref={'editModal'} parentFlatList={this}></EditModal>
       </View>
       </Container>
     );
@@ -125,11 +155,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'green',
     margin: 20,
     marginBottom: 0,
-  },
-  flatListItem: {
-    color: 'white',
-    padding: 10,
-    fontSize: 18,
+    padding:10,
+    flexDirection:"row",    
   },
   button: {
     padding: 10,
@@ -152,8 +179,28 @@ const styles = StyleSheet.create({
   noteDeleteText: {
       color: 'white',
   },
+  editbutton: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#2980b9',
+    padding: 10,
+    top: 10,
+    right: 80,
+    bottom: 10,
+  },
+  edittext: {
+    color: 'white',
+  },
+
+  checkBoxTxt:{
+    marginLeft:20
+  },
+  checkbox:{
+     color: 'white',
+  },
+
 
   });
   
 export default App;
-
